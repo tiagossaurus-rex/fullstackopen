@@ -1,0 +1,6 @@
+Browser->Server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa [payload: {content, date}]
+Server->Browser: 201 Created [response: {"message":"note created"}]
+
+note over Browser:
+Browser executes event handler that causes notes to diplay
+end note
