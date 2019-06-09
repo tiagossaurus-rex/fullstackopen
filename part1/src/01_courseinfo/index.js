@@ -17,7 +17,7 @@ const Part  = ({part}) => {
 
 const Content = ({parts}) => {
     return (
-        parts.map(part => <Part part={part} />)
+        parts.map(part => <Part key={part.name} part={part} />)
     )
 }
 
