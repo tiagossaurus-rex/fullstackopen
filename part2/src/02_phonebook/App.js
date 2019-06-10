@@ -1,45 +1,13 @@
 import React, { useState } from 'react'
-import axios from 'axios';
 
+import {
+	Form,
+	Input,
+	Filter,
+	Persons,
+} from './components'
 
-const Form = (props) => {
-	return (
-		<form onSubmit={e => props.handleSubmit(e)}>
-			{props.children}
-			<div>
-				<button disabled={props.disabled} type="submit">add</button>
-			</div>
-		</form>
-	)
-}
-
-const Input = ({id, value, handleChange}) => {
-	return (
-		<div>
-			{id}: <input value={value} onChange={e => handleChange(e.target.value)}/>
-		</div>
-	)
-}
-
-const Filter = ({value, handleChange}) => {
-	return (
-		<div>
-			filter: 
-			<input value={value} onChange={e => handleChange(e.target.value.toLowerCase())}/>
-			<button onClick={() => handleChange('')}>x</button>
-		</div>
-	)
-}
-
-const Entry = ({name, number})=> <p>{`${name}: ${number ? number : 'unknown'}`}</p>
-
-const Persons = ({persons, filter}) => {
-	return (
-		persons
-			.filter(({name}) => name.toLowerCase().indexOf(filter) !== -1 )
-			.map(({name, number}) => <Entry key={name} name={name} number={number} />)
-	)
-}
+import personsService from './services/persons'
 
 
 const App = () => {
@@ -49,11 +17,11 @@ const App = () => {
 	const [ filter, setFilter ] = useState('')
 
 	useState(() => {
-		axios
-        .get('http://localhost:3001/persons')
-        .then(response => {
-            setPersons(response.data)
-        })
+		personsService
+			.getAll()
+			.then(data => {
+				setPersons(data)
+			})
 	}, [])
 
 
@@ -61,21 +29,72 @@ const App = () => {
 		e.preventDefault();
 		if ( !newName || !newNumber ) return false;
 
-		const hasDup = persons.filter(person => person.name === newName)
+		const existingDup = persons.filter(person => person.name === newName)
 
-		if ( hasDup.length ) {
-			alert(`${newName} is already added to phonebook`)
-		} else {
-			setPersons([
-				...persons,
-				{
-					name: newName,
-					number: newNumber,
-				},
-			])
-			setNewName('')
-			setNewNumber('')
+		const newPerson = {
+			name: newName,
+			number: newNumber,
 		}
+
+		if ( existingDup.length ) {
+			
+			const confirmDialog = window.confirm(
+				`${newName} is already added to phonebook, replace the old number with a new one?`
+			)
+
+			if ( confirmDialog ) {
+				
+				personsService
+					.update(existingDup[0].id, newPerson)
+					.then(updatedPerson => {
+						
+						setPersons(
+							persons.map(person => {
+								return person.id === updatedPerson.id ? updatedPerson : person
+							})
+						)
+						
+						setNewName('')
+						setNewNumber('')
+					})
+					.catch((error) => {
+						console.log(error.response)
+					})
+			}
+
+
+		} else {
+
+			personsService
+				.create(newPerson)
+				.then(data => {
+					setPersons([
+						...persons,
+						data,
+					])
+					setNewName('')
+					setNewNumber('')
+				})
+
+		}
+	}
+
+	const handleDelete = (e, person) => {
+		e.preventDefault();
+
+		const confirmDialog = window.confirm(`delete ${persons[person.name]}`)
+
+		if ( confirmDialog ) {
+			personsService
+				.remove(person.id)
+				.then(data => {
+					setPersons(persons.filter(p => p.id !== person.id))
+				})
+				.catch((error) => {
+					console.log(error.response)
+				})
+		}
+		
 	}
 
 	return (
@@ -99,7 +118,7 @@ const App = () => {
 					/>
 			</Form>
 			<h2>Numbers</h2>
-			<Persons persons={persons} filter={filter} />
+			<Persons persons={persons} filter={filter} handleDelete={handleDelete} />
 		</div>
 	)
 }

@@ -5,6 +5,6 @@ import App2 from './02_phonebook/App'
 import App3 from './03_countries_api/App'
 
 ReactDOM.render(
-	<App3 />,
+	<App2 />,
 	document.getElementById('root')
 )
