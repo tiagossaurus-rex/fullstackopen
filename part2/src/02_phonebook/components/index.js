@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const Form = (props) => {
 	return (
@@ -54,10 +54,57 @@ const Persons = ({persons, filter, handleDelete}) => {
 	)
 }
 
+
+const Notification = ({notification}) => {
+
+
+	if ( !notification ) {
+		return null;
+	}
+
+	const {
+		message,
+		type
+	} = notification;
+
+	const style = {
+		default: {
+			display: 'block',
+			background: `rgba(76, 175, 80, 0.2)`,
+			border: `2px solid #4CAF50`,
+			color: '#1b5e20',
+			padding: '0 16px',
+			margin: '16px 0',
+			fontWeight: 'bold',
+		},
+		success: {
+			background: `rgba(76, 175, 80, 0.2)`,
+			border: `2px solid #4CAF50`,
+			color: '#1b5e20',
+		},
+		error: {
+			background: `rgba(244, 67, 54, 0.2)`,
+			border: `2px solid #f44336`,
+			color: '#B71C1C',
+		},
+	}
+	
+
+	return (
+		<div style={{
+				...style.default,
+				...style[type]
+			}}>
+			<p>{message}</p>
+		</div>
+	)
+}
+
 export {
     Form,
     Input,
     Filter,
     Entry,
-    Persons,
+	Persons,
+	Notification,
 }
