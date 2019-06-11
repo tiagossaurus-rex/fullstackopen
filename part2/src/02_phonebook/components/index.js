@@ -22,7 +22,7 @@ const Input = ({id, value, handleChange}) => {
 const Filter = ({value, handleChange}) => {
 	return (
 		<div>
-			filter: 
+			<strong>filter contacts: </strong>
 			<input value={value} onChange={e => handleChange(e.target.value.toLowerCase())}/>
 			<button onClick={() => handleChange('')}>x</button>
 		</div>

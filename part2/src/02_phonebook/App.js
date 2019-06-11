@@ -30,7 +30,6 @@ const App = () => {
 	useEffect(() => {
 		const wait = setTimeout(() => {
 			if(notification !== null) {
-				console.log('asdada')
 				setNotification(null)
 			}
 		}, 5000)
@@ -44,7 +43,7 @@ const App = () => {
 		e.preventDefault();
 		if ( !newName || !newNumber ) return false;
 
-		const existingDup = persons.filter(person => person.name === newName)
+		const existingDup = persons.filter(person => person.name === newName);
 
 		const newPerson = {
 			name: newName,
@@ -77,10 +76,6 @@ const App = () => {
 						})
 					})
 					.catch((error) => {
-						setNotification({
-							message: 'Something went wrong, please try again',
-							type: 'error',
-						});
 						setPersons(persons.filter(p => p.id !== existingDup[0].id))
 						setNotification({
 							message: `${newName} has already been removed from server`,
@@ -119,7 +114,7 @@ const App = () => {
 	const handleDelete = (e, person) => {
 		e.preventDefault();
 
-		const confirmDialog = window.confirm(`delete ${person.name}`)
+		const confirmDialog = window.confirm(`delete ${person.name}?`)
 
 		if ( confirmDialog ) {
 			personsService
@@ -143,10 +138,9 @@ const App = () => {
 
 	return (
 		<div>
-			<h2>Phonebook</h2>
+			<h1>Phonebook</h1>
 			<Notification notification={notification} />
-			<Filter value={filter} handleChange={setFilter} />
-			<h2>Add new</h2>
+			<h2>Add Contact</h2>
 			<Form
 				handleSubmit={handleSubmit}
 				disabled={!newName || !newNumber}
@@ -162,8 +156,15 @@ const App = () => {
 					handleChange={setNewNumber}
 					/>
 			</Form>
-			<h2>Numbers</h2>
-			<Persons persons={persons} filter={filter} handleDelete={handleDelete} />
+			<h2>Contacts</h2>
+			{ persons.length ?
+				<>
+					<Filter value={filter} handleChange={setFilter} />
+					<Persons persons={persons} filter={filter} handleDelete={handleDelete} />
+				</>
+				:
+				<p>You don't have any contacts yet</p>
+			}
 		</div>
 	)
 }
